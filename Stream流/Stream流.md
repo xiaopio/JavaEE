@@ -530,6 +530,8 @@ System.out.println(map);
 备注：演员类Actor，属性：name，age
 ```
 
+**自己写的（太复杂！！！）**
+
 ```java
 /*
 现在有两个ArrayList集合，
@@ -561,7 +563,7 @@ List<String> newActorList = actorList.stream()
 // 女演员
 // 只要姓杨的，并且不要第一个
 List<String> newActressList = actressList.stream()
-    	// 这里的可以改为.filter(s -> (s.split(",")[0].startsWith("杨"))
+    	// 这里的可以改为.filter(s -> s.split(",")[0].startsWith("杨"))
         .filter(s -> "杨".equals(s.split(",")[0].substring(0, 1)))
         .skip(1)
         .collect(Collectors.toList());
@@ -646,3 +648,97 @@ class Actor {
     }
 }
 ```
+
+**黑马教的**
+
+```java
+        /*
+        现在有两个ArrayList集合，
+        第一个集合中：存储6名男演员的姓名和年龄。第二个集合中存储6名女演员的姓名和年龄。
+        姓名和年龄中间用逗号分隔开。例如：张三,23
+        要求完成如下操作：
+        1.男演员只要名字为3个字的前两人
+        2.女演员只要姓杨的，并且不要第一个
+        3.把过滤后的男女演员姓名合并在一起
+        4.将上一步的演员信息封装成Actor对象
+        5.将所有演员对象都保存在List集合中。
+        备注：演员类Actor，属性：name，age
+         */
+        // 男演员集合
+        ArrayList<String> actorList = new ArrayList<>();
+        Collections.addAll(actorList, "陈学冬,26", "胡歌,27", "霍建华,30", "古巨基,29", "六小龄童,27", "陈晓旭,22", "邓伦,26");
+        // 女演员集合
+        ArrayList<String> actressList = new ArrayList<>();
+        Collections.addAll(actressList, "唐嫣,26", "赵丽颖,26", "杨颖,30", "杨幂,23", "六小龄童,27", "孙怡,24", "杨紫,26");
+
+        // 筛选
+        // 男演员
+        // 只要名字为3个字的前两人
+        Stream<String> actorStream = actorList.stream()
+                .filter(s -> s.split(",")[0].length() == 3)
+                .limit(2);
+
+
+        // 女演员
+        // 只要姓杨的，并且不要第一个
+        Stream<String> actressStream = actressList.stream()
+                .filter(s -> s.split(",")[0].startsWith("杨"))
+                .skip(1);
+
+        // 将上一步的演员信息封装成Actor对象
+/*        Stream.concat(actorStream, actressStream).map(new Function<String, Actor>() {
+            @Override
+            public Actor apply(String s) {
+                String name = s.split(",")[0];
+                int age = Integer.parseInt(s.split(",")[1]);
+                return new Actor(name, age);
+            }
+        }).forEach(s -> System.out.println(s));*/
+        
+        // 将两个Stream流合并，然后将演员信息封装成Actor对象，最后保存在theFinalCastList集合中
+        List<Actor> theFinalCastList = Stream.concat(actorStream, actressStream)
+                .map(s -> new Actor(s.split(",")[0], Integer.parseInt(s.split(",")[1])))
+                .collect(Collectors.toList());
+        
+        // 打印输出结果
+        System.out.println(theFinalCastList);
+
+    }
+
+
+class Actor {
+    private String name;
+    private int age;
+
+    public Actor() {
+    }
+
+    public Actor(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    @Override
+    public String toString() {
+        return "姓名：" + name + " 年龄：" + age;
+    }
+}
+```
+
